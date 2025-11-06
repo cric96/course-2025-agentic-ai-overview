@@ -317,6 +317,8 @@
 )
 
 == Ollama - Modelli Supportati
+- Link: https://ollama.com/models
+
 - #strong[Famiglia LLaMA]: LLaMA 2/3/3.1/3.2 (7B-405B parametri)
 - #strong[Mistral]: Mistral 7B, Mixtral 8x7B (Mixture of Experts)
 - #strong[Qwen]: Qwen2 0.5B-72B (multilingua, coding)
@@ -329,26 +331,24 @@
   Processo di riduzione della precisione numerica dei pesi del modello (es. da 16-bit float a 4-bit int) per ridurre memoria e aumentare velocità, con minima perdita di qualità.
 ]
 - #strong[Q4_K_M]: 4-bit, bilanciamento qualità/performance (default)
-- #strong[Q5_K_M]: 5-bit, qualità superiore, +25% memoria
 - #strong[Q8_0]: 8-bit, qualità quasi originale, +100% memoria
 - Trade-off: modello più piccolo = inferenza più veloce ma risposte meno accurate
 
 == Requisiti di Memoria - Calcolo Approssimativo
-#strong[Formula base]: #text(fill: rgb("#1e40af"))[Memoria (GB) ≈ Parametri × Bit per peso / 8 × 10⁹]
+#align(center)[
+  #strong[Formula base]: #text(fill: rgb("#1e40af"))[Memoria (GB) ≈ Parametri × Bit per peso / 8 × 10⁹]
 
-#table(
-  columns: 5,
-  [*Modello*], [*Parametri*], [*FP16 (16-bit)*], [*Q8 (8-bit)*], [*Q4 (4-bit)*],
-  [Phi-3], [3.8B], [~7.6 GB], [~3.8 GB], [~1.9 GB],
-  [LLaMA 3.2], [7B], [~14 GB], [~7 GB], [~3.5 GB],
-  [Mistral], [7B], [~14 GB], [~7 GB], [~3.5 GB],
-  [LLaMA 3.1], [13B], [~26 GB], [~13 GB], [~6.5 GB],
-  [Qwen 2.5], [32B], [~64 GB], [~32 GB], [~16 GB],
-  [LLaMA 3.1], [70B], [~140 GB], [~70 GB], [~35 GB],
-)
+  #table(
+    columns: 5,
+    [*Modello*], [*Parametri*], [*FP16 (16-bit)*], [*Q8 (8-bit)*], [*Q4 (4-bit)*],
+    [Phi-3], [3.8B], [~7.6 GB], [~3.8 GB], [~1.9 GB],
+    [LLaMA 3.2], [7B], [~14 GB], [~7 GB], [~3.5 GB],
+    [Mistral], [7B], [~14 GB], [~7 GB], [~3.5 GB],
+    [LLaMA 3.1], [13B], [~26 GB], [~13 GB], [~6.5 GB],
+    [Qwen 2.5], [32B], [~64 GB], [~32 GB], [~16 GB],
+    [LLaMA 3.1], [70B], [~140 GB], [~70 GB], [~35 GB],
+  )
 
-#text(size: 0.8em, fill: rgb("#dc2626"))[
-  *Nota*: Memoria aggiuntiva necessaria per KV cache (~2-4 GB) e overhead sistema (~1-2 GB)
 ]
 
 == Requisiti Hardware - Linee Guida
@@ -375,6 +375,7 @@
   #strong[Modelli Large (70B+)]: Richiedono GPU server (A100 80GB, H100) o multi-GPU setup
 ]
 
+/*
 == Performance: CPU vs GPU
 #grid(
   columns: 2,
@@ -396,7 +397,7 @@
     - #emph[Scenario]: produzione, real-time, UI interattive
   ]
 )
-
+*/
 == Performance: Fattori Critici
 #strong[Throughput dipende da]:
 - #strong[Context length]: più lungo = più lento (crescita quadratica per attention)
