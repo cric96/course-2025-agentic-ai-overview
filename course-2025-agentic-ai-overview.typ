@@ -59,7 +59,7 @@
   ),
 )
 
-#set text(font: "Fira Sans", weight: "regular", size: 20pt)
+//#set text(font: "Fira Sans", weight: "regular", size: 20pt)
 
 #set raw(tab-size: 4)
 #show raw: set text(size: 1em)
