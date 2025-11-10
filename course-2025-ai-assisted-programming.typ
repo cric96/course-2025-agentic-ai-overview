@@ -60,7 +60,6 @@
 )
 
 #set text(font: "Fira Sans", weight: "regular", size: 20pt)
-
 #set raw(tab-size: 4)
 #show raw: set text(size: 1em)
 #show raw.where(block: true): block.with(
@@ -84,17 +83,20 @@
 #text(size: 1.3em)[
   #components.adaptive-columns(outline(title: none, indent: 1em, depth: 1))
 ]
+
+*Code*: #link("https://github.com/cric96/code-2025-agentic-ai")
+
 #focus-slide[
   == Obiettivi
   #align(left)[
     - Componenti principali di un'agente di (generative) AI
     - Provider per usare modelli di linguaggio grandi (LLM)
-    - MCP come mezzo per far interagire strumenti/servizi esterni con LLM
+    - Model Context Protocol (MCP) come mezzo per far interagire strumenti/servizi esterni con LLM
     - Esempi di agenti locali
   ]
 ]
 
-= Introduzione AI Agents
+= Introduzione agli Agenti AI
 
 == Generative AI - Cosa abbiamo visto finora?
 #note-block[Large Language Models (LLM)][
@@ -111,7 +113,7 @@
 == Verso il concetto di Agente
 
 #definition-block[Agente][
-  Un agente è un'entità #underline[autonoma] che può percepire il suo *ambiente* e #underline[agire] su di esso per raggiungere #underline[obiettivi specifici].
+  Un agente è un'entità #underline[autonoma] che può percepire il suo *ambiente* e capace di #underline[agire] su di esso per raggiungere #underline[obiettivi specifici].
 ]
 - Le applicazioni di generative AI viste finora sono agenti?
   - *In parte sì!*
@@ -119,7 +121,7 @@
   - GitHub Copilot interagisce con l'IDE e il codice esistente (ambiente)
 
 
-== Appliicazioni generative AI - Come le abbiamo viste finora ...
+== Applicazioni generative AI - Come le abbiamo viste finora ...
 
 #align(center)[
   #image("images/agente-semplice.png", width: 80%)
@@ -206,7 +208,7 @@
   ],
 )
 
-== Posso crearmi un agente AI?
+== Agenti AI Locali - Panoramica
 - Inizialmente, gli strumenti AI erano principalmente:
   - Modelli LLM closed-source (es. GPT-3, GPT-4)
   - Servizi cloud proprietari (es. OpenAI, Claude)
@@ -274,7 +276,7 @@
   ],
   [
     - I provider sono #strong[interfacce di astrazione] che unificano l'accesso ai LLM: standardizzano le API e nascondono differenze implementative.
-    - Ricordiamo: un modello = #strong[pesi] + #strong[architettura].
+    - Ricordiamo: un modello = #strong[pesi] + #strong[architettura] + #strong[runtime].
     - Tipi: servizi cloud (OpenAI, Anthropic, Hugging Face) o runtime locali (Ollama, LM Studio, vLLM).
   ],
 )
@@ -317,6 +319,9 @@
 )
 
 == Ollama - Panoramica
+#align(center)[
+  #image("images/ollama.png", width: 20%)
+]
 - Ollama è un #strong[runtime ottimizzato] per eseguire LLM localmente
 - Caratteristiche principali:
   - #strong[Quantizzazione automatica]: riduce requisiti memoria (es. da FP16 a Q4)
@@ -325,9 +330,7 @@
   - #strong[API compatibile OpenAI]: drop-in replacement per applicazioni esistenti
 
 == Ollama - Architettura Interna
-#align(center)[
-  #image("images/ollama.png", width: 20%)
-]
+
 #grid(
   columns: 2,
   gutter: 2em,
@@ -355,7 +358,7 @@
 - #strong[Qwen]: Qwen2 0.5B-72B (multilingua, coding)
 - #strong[Phi]: Microsoft Phi-3 (modelli compatti 3B-14B)
 - #strong[Gemma]: Google Gemma 2B-27B
-- Ogni modello disponibile in #underline[varianti quantizzate]: Q4, Q5, Q8, FP16
+- Ogni modello disponibile in #underline[varianti quantizzate]: Q4, Q8, FP16
 
 == Ollama - Quantizzazione
 #definition-block[Quantizzazione][
@@ -367,7 +370,7 @@
 
 == Requisiti di Memoria - Calcolo Approssimativo
 #align(center)[
-  #strong[Formula base]: #text(fill: rgb("#1e40af"))[Memoria (GB) ≈ Parametri × Bit per peso / 8 × 10⁹]
+  #strong[Formula base]: #text(fill: rgb("#1e40af"))[Memoria (GB) ≈ Parametri × Bit per peso / (8 × 10⁹)]
 
   #table(
     columns: 5,
@@ -444,17 +447,20 @@
 ]
 
 == Ollama - Comandi Pratici
+Installazione sia Nativa che via Docker: https://ollama.com/download
+
+Alcuni comandi utili:
 ```bash
-# Eseguire un modello (download automatico se necessario)
+# Esegue un modello (download automatico se necessario)
 ollama run llama3.2:3b
 
-# Listare modelli installati localmente
+# Elenca i modelli installati localmente
 ollama list
 
-# Scaricare un modello senza eseguirlo
+# Scarica un modello senza eseguirlo
 ollama pull gemma3:270m
 
-# Avviare server API (porta 11434)
+# Avvia il server API (porta 11434)
 ollama serve
 ```
 
@@ -476,7 +482,7 @@ client.completions.create(model="gemma3:270m", prompt="Ciao, come stai?").choice
 ```
 = Interfacce Uomo - Macchina per Agenti AI
 == Interazione via Agenti AI
-- Il focus principale per questo corso sono agenti *conversazionali* che interagiscono con utenti umani
+- Il focus principale di questo corso sono agenti *conversazionali* che interagiscono con utenti umani
   - Possono avere dell'autonomia (lo vedremo dopo)
   - Ma necessitano *sempre* di un input dall'umano (e feedback) per funzionare
   #align(center)[
@@ -630,13 +636,24 @@ agent.invoke({
 = Strumenti e MCP
 
 == Strumenti per Agenti AI
-- Gli agenti devono poter interagire con #strong[strumenti esterni] per eseguire compiti specifici oltre le capacità del solo LLM
-  - In base all'#underline[obiettivo], l'agente seleziona autonomamente quali strumenti utilizzare
-- Analogia umana: dato un goal, scegliamo gli strumenti più adatti per raggiungerlo
-  - #emph[Esempio]: per appendere un quadro → martello, chiodi, livella, metro
-- #strong[Perché servono strumenti?]
-  - LLM generano solo testo, non possono eseguire calcoli complessi, accedere a dati real-time o interagire con sistemi esterni
-  - Gli strumenti colmano questo gap, estendendo le capacità dell'agente
+#grid(
+  columns: (1.9fr, 0.5fr),
+  gutter: 2em,
+  [
+    - Gli agenti devono poter interagire con #strong[strumenti esterni] per eseguire compiti specifici oltre le capacità del solo LLM
+      - In base all'#underline[obiettivo], l'agente seleziona autonomamente quali strumenti utilizzare
+    - Analogia umana: dato un goal, scegliamo gli strumenti più adatti per raggiungerlo
+      - #emph[Esempio]: per appendere un quadro → martello, chiodi, livella, metro
+    - #strong[Perché servono strumenti?]
+      - LLM generano solo testo, non possono eseguire calcoli complessi, accedere a dati real-time o interagire con sistemi esterni
+      - Gli strumenti colmano questo gap, estendendo le capacità dell'agente
+  ],
+  [
+    #align(center)[
+      #image("images/tools.png", width: 100%)
+    ]
+  ],
+)
 
 == Anatomia di uno strumento
 - #strong[Strumento]: componente esterno che un agente può invocare per ottenere informazioni o eseguire azioni specifiche
@@ -678,10 +695,15 @@ If you use a tool, respond with ONLY the tool call in the exact format specified
 If you don't need a tool, respond normally to the user.
 ```
 
+#focus-slide[
+  == Demo su LangChain
+  Creazione di un agente con strumenti personalizzati
+]
+
 == LangChain - Esempio di agente con strumenti
 
-- In LanghChain, quando si crea un agente, si possono definire strumenti personalizzati che l'agente può utilizzare
-- Un tool in langhchain è un pezzo di codice annotato e documentato:
+- In #strong[LangChain], puoi #underline[creare agenti AI] che usano #strong[strumenti personalizzati] per estendere le loro capacità
+- Un #strong[tool] in LangChain è una funzione annotata e documentata che l'agente può #underline[invocare autonomamente]:
 ```python
 from langchain.tools import tool
 from datetime import datetime
@@ -712,14 +734,25 @@ agent = create_agent(
   - L'interprete esegue il comando e ritorna il risultato
   - L'agente formula la risposta finale
 
-== Strumenti - Problema
-- Inizialmente ogni produttore di agenti AI implementava il proprio modo di definire e usare strumenti
-- Questo portava a #strong[problemi di interoperabilità]:
-  - Strumenti definiti per un framework non funzionavano in un altro
-  - Difficoltà a #underline[riutilizzare] strumenti tra progetti diversi
-- Questo problema è simile a quello affontato con durante il Web con le API
-  - Per il web si è risolto con standard come REST API
-- Per le generative AI?
+== Strumenti - Il Problema dell'Interoperabilità
+#grid(
+  columns: (0.7fr, 1.3fr),
+  gutter: 2em,
+  [
+    #image("images/interoperability-issue.png", width: 100%)
+  ],
+  [
+    - Ogni framework AI aveva il suo modo di definire strumenti:
+      - LangChain usava decoratori Python
+      - OpenAI richiedeva JSON Schema specifico
+      - Altri framework avevano formati proprietari
+    - #strong[Risultato]: stesso strumento, implementazioni diverse per ogni piattaforma!
+    - #strong[Conseguenze]:
+      - Strumenti non riutilizzabili tra progetti
+      - Duplicazione di codice e sforzi
+      - Difficoltà a mantenere consistenza
+  ],
+)
 
 #focus-slide[
   == Soluzione: MCP - Model Context Protocol
@@ -729,20 +762,27 @@ agent = create_agent(
 ]
 
 == MCP - Il Problema della Torre di Babele
-- Ogni framework AI aveva il suo modo di definire strumenti:
-  - LangChain usava decoratori Python
-  - OpenAI richiedeva JSON Schema specifico
-  - Altri framework avevano formati proprietari
-- #strong[Risultato]: stesso strumento, 5 implementazioni diverse!
-  
-#strong[Analogia]: prima di REST API, ogni sito web aveva protocolli diversi
-- Con REST: un'unica interfaccia standard per tutti i servizi web
-- Con MCP: un'unica interfaccia standard per strumenti AI
 
-== MCP - Il Problema della Torre di Babele
-#align(center)[
-  #image("images/with-mcp-without.png")
-]
+#grid(
+  columns: 2,
+  gutter: 2em,
+  [
+    #strong[Analogia con il Web]
+    - Prima di REST API: ogni sito web con protocolli diversi
+    - Con REST: un'unica interfaccia standard per tutti i servizi web
+    - Per l'AI serve lo stesso approccio → #strong[MCP]
+    - Con MCP: un'unica interfaccia standard per strumenti AI
+  ],
+  [
+    #align(center)[
+      #image("images/with-mcp-without.png", width: 100%)
+    ]
+  ],
+)
+
+
+
+
 == MCP - Cos'è?
 #grid(
   columns: 2,
@@ -750,13 +790,13 @@ agent = create_agent(
   [
     #strong[Model Context Protocol (MCP)]
     - Standard #underline[aperto] sviluppato da Anthropic
-    - Permette di connettere AI a strumenti e dati
-    - Come REST API per il web, MCP per l'AI
+    - Permette di #underline[connettere AI a strumenti e dati]
+    - Come REST API per il web, #underline[MCP per l'AI]
     
     #strong[Benefici immediati]
-    - Scrivi uno strumento, funziona ovunque
-    - Ecosistema condiviso di strumenti riusabili
-    - Riduce complessità di integrazione
+    - Uno strumento MCP #underline[non dipende da chatbot specifici]
+    - #underline[Ecosistema condiviso] di strumenti riusabili
+    - #underline[Riduce complessità] di integrazione
   ],
   [
     #align(center)[
@@ -766,11 +806,11 @@ agent = create_agent(
 )
 
 == MCP - Architettura: i 3 Attori Principali
-
 #align(center)[
-  #image("images/struttura_mcp.png", width: 50%)
+  #image("images/host-client-server.png", width: 80%)
 ]
 
+== MCP - Architettura: i 3 Attori Principali
 #grid(
   columns: 3,
   gutter: 1.5em,
@@ -778,12 +818,11 @@ agent = create_agent(
     #strong[1. Host]
     - L'applicazione che usi (VS Code, Claude Desktop)
     - Gestisce l'interfaccia utente
-    - Coordina tutto
     - #emph[Esempio]: il tuo editor di codice
   ],
   [
     #strong[2. Client]
-    - "Interprete" che traduce richieste
+    - "Interprete" che traduce richieste le tra host e server
     - 1 client per ogni server
     - Trasparente (non lo vedi)
     - #emph[Gestito automaticamente dall'host]
@@ -792,34 +831,15 @@ agent = create_agent(
     #strong[3. Server]
     - Fornisce gli strumenti veri e propri
     - Es: accesso file, database, API
-    - Può essere locale o remoto
+    - Può essere locale (stdio) o remoto (streamable http)
     - #emph[Esempio]: server filesystem MCP
   ],
 )
 
 == MCP - Come Funziona in Pratica
 #strong[Scenario]: Vuoi che l'AI legga un file e ti faccia un riassunto
+#image("images/flusso.png", width: 100%)
 
-#grid(
-  columns: 2,
-  gutter: 2em,
-  [
-    #strong[Flusso di esecuzione]:
-    1. #emph[Tu]: "Riassumi il file report.txt"
-    2. #emph[Host (VS Code)]: capisce che serve leggere un file
-    3. #emph[Client]: chiede al server MCP filesystem quali strumenti ha
-    4. #emph[Server]: risponde "posso leggere file con `read_file`"
-    5. #emph[AI]: genera comando `read_file("report.txt")`
-    6. #emph[Server]: esegue e ritorna il contenuto
-    7. #emph[AI]: riceve il testo e crea il riassunto
-  ],
-  [
-    #align(center)[
-      // TODO: Diagramma di sequenza semplificato
-      #text(fill: gray)[_\[Placeholder: Diagramma sequenza interazione\]_]
-    ]
-  ],
-)
 
 == Output Strutturato - Cosa Significa?
 #strong[Gli strumenti MCP usano #emph[JSON Schema] per definire input e output]
@@ -907,32 +927,8 @@ agent = create_agent(
   ],
 )
 
-== MCP Resources vs Tools - Quando Usare Cosa?
 
-#grid(
-  columns: 2,
-  gutter: 2em,
-  [
-    #strong[Resources] (solo lettura)
-    - #emph[Quando]: dati da consultare
-    - #emph[Esempi]:
-      - Contenuto di un file
-      - Record di un database
-      - Documentazione
-    - #emph[Metafora]: biblioteca di consultazione
-  ],
-  [
-    #strong[Tools] (azioni)
-    - #emph[Quando]: operazioni da eseguire
-    - #emph[Esempi]:
-      - Inviare un'email
-      - Creare un file
-      - Chiamare un'API
-    - #emph[Metafora]: attrezzi del mestiere
-  ],
-)
-
-== MCP - Dettagli Tecnici Compatti
+== MCP - Dettagli Tecnici
 
 #strong[Architettura Client-Host-Server]
 - Host crea e gestisce client multipli (1 client = 1 server)
@@ -946,9 +942,8 @@ agent = create_agent(
 
 #strong[Principi di design]
 - Server facili da costruire (host gestisce complessità)
-- Alta componibilità (server multipli si combinano seamlessly)
-- Isolamento e sicurezza (server riceve solo contesto necessario)
-- Evoluzione progressiva (compatibilità retroattiva)
+- Alta componibilità (server multipli si combinano facilmente)
+- Isolamento e sicurezza (server riceve solo il contesto necessario)
 
 == MCP Transport - Due Modalità
 
@@ -957,29 +952,23 @@ agent = create_agent(
   gutter: 2em,
   [
     #strong[stdio] (processi locali)
-    - Client lancia server come subprocess
+    - Client lancia server come sotto processo
     - Comunicazione via stdin/stdout
-    - Semplice e diretto
+    - Semplice e diretto (uno a uno)
     - #emph[Uso]: server locali, strumenti filesystem
-    
-    #align(center)[
-      // TODO: Diagramma stdio
-      #text(fill: gray)[_\[Placeholder: stdio diagram\]_]
-    ]
   ],
   [
-    #strong[HTTP+SSE] (servizi remoti)
+    #strong[HTTP Streamable] (servizi remoti)
     - Server indipendente con endpoint HTTP
-    - POST per inviare, GET+SSE per ricevere
-    - Supporta connessioni multiple
+    - POST per inviare, GET+SSE per ricevere (opzionalmente)
+    - Supporta connessioni multiple 
     - #emph[Uso]: API remote, servizi cloud
-    
-    #align(center)[
-      // TODO: Diagramma HTTP
-      #text(fill: gray)[_\[Placeholder: HTTP diagram\]_]
-    ]
   ],
 )
+#align(center)[
+  #image("images/mcp-stdio-streamable.png", width: 40%)
+]
+
 
 
 == MCP - Ecosistema e Adozione
@@ -1019,24 +1008,6 @@ agent = create_agent(
   ],
 )
 
-== MCP - Dettagli Tecnici (Per Approfondire)
-#set text(16pt)
-#strong[Protocollo e Messaggi]
-- Basato su #emph[JSON-RPC 2.0] (requests, responses, notifications, batch)
-- Lifecycle: #underline[initialization] → operation → shutdown
-- Negoziazione capacità: client e server dichiarano feature supportate
-
-#strong[Transport Layer]
-- #emph[stdio]: subprocess locale (stdin/stdout), semplice e diretto
-- #emph[HTTP+SSE]: servizi remoti, POST per inviare, GET+SSE per ricevere
-
-#strong[Sicurezza]
-- Isolamento tra server (ogni server vede solo suo contesto)
-- Autenticazione per HTTP transport
-- Validazione Origin header (prevenire DNS rebinding)
-
-#text(size: 0.8em)[Dettagli completi nella specifica ufficiale su GitHub]
-
 
 == MCP - Esempio Pratico: Creare un Server
 #strong[Server MCP in Python con FastMCP]
@@ -1064,37 +1035,137 @@ mcp.run(transport="streamable-http")
 ]
 
 == Docker MCP Servers
-- Implementarsi un server MCP da zero può essere complesso
-- Fortunatamente esistono molti server MCP open-source pronti all'uso su Docker
+- #strong[Implementare] un server MCP da zero può essere #underline[complesso]
+- #strong[Fortunatamente], esistono #underline[molti server MCP open-source] pronti all'uso su Docker
+#align(center)[
+  #image("images/docker-desktop.png", width: 70%)
+]
 
-== Docker MCP Servers - Esempi
 
+== MCP Gateway - Il Problema della Frammentazione
 
-== Verso il Gateway
-- Potrei avere diversi server MCP (file system, database, API esterne)
-- Ogni server ha il suo client dedicato
-- Se voessi esporre un'unica interfaccia verso l'host?
-- #strong[Gateway MCP]: un client che aggrega più server MCP dietro un'unica interfaccia
-- Funge sia da #emph[proxy] che smista le richieste ai server corretti
+#grid(
+  columns: 2,
+  gutter: 2em,
+  [
+    #strong[Scenario reale]
+    - Un'applicazione AI può usare #underline[decine di server MCP]:
+      - Filesystem per leggere documenti
+      - Database per query SQL
+      - API esterne (meteo, email, calendario)
+      - Servizi aziendali interni
+    
+    #strong[Senza Gateway]
+    - Host deve gestire #emph[N client] separati
+    - Configurazione complessa e ripetitiva
+    - Difficile manutenzione e debugging
+  ],
+  [
+    #strong[Soluzione: MCP Gateway]
+    - #underline[Un'unica interfaccia] verso l'host
+    - Gateway come #emph[proxy intelligente]
+    - Smista le richieste ai server corretti
+    - Gestione centralizzata di:
+      - Autenticazione
+      - Rate limiting
+      - Logging e monitoring
+      - Failover e retry logic
+  ],
+)
 
 == MCP Gateway - Architettura
 #align(center)[
-  #image("images/mcp-gateway-docker.png", width: 90%)
+  #image("images/mcp-gateway-docker.png", width: 100%)
 ]
+
+== MCP Gateway via Docker - Setup Rapido
+
+#grid(
+  columns: 2,
+  gutter: 2em,
+  [
+    #strong[Avvio del Gateway]
+    ```bash
+    docker mcp run gateway
+    ```
+    
+    #strong[Cosa fa questo comando?]
+    - Avvia un container Docker con il Gateway MCP
+    - Espone un #underline[singolo endpoint] che aggrega tutti i server MCP
+    - Pronto all'uso senza configurazione complessa
+  ],
+  [
+    #strong[Opzioni di configurazione]
+    - #emph[Transport]: scegli `stdio` o `http-streamable`
+      ```bash
+      docker mcp run gateway --transport http
+      ```
+    - #emph[Server selettivi]: includi solo alcuni server
+      ```bash
+      docker mcp run gateway \
+        --servers filesystem,postgres
+      ```
+   
+  ],
+)
 
 #focus-slide[
   == Demo
   Mostriamo come usare un MCP Gateway con OpenWebUI e LM Studio (e LangChain)
 ]
-== MCP Gateway - OpenWEB UI
 
-== MCP Gateway - LM Studio
+== MCP - Ricapitolando
 
-== MCP Gateway - LangChain
+#grid(
+  columns: 2,
+  gutter: 2em,
+  [
+    #strong[Punti chiave appresi]
+    - MCP #underline[standardizza] l'integrazione di strumenti AI
+    - Architettura #emph[Host-Client-Server] componibile
+    - #strong[3 building blocks]: Tools, Resources, Prompts
+    - Ecosistema in rapida crescita (100+ server)
+    - #strong[Gateway] unifica più server in un'unica interfaccia
+    
+    #strong[Vantaggi pratici]
+    - Strumenti #underline[riusabili] tra piattaforme diverse
+    - Riduzione della complessità di integrazione
+    - Deploy semplificato (Docker, HTTP, stdio)
+  ],
+  [
+    #strong[Applicazioni reali]
+    - VS Code, Claude Desktop (host)
+    - Filesystem, Database, API (server)
+    - OpenWebUI, LM Studio (integrazione)
+    
+  ],
+)
 
-= Prospettive Future: Sistemi Multi-Agente
+== MCP - Argomenti Avanzati (Non Trattati)
 
-== Perché Sistemi Multi-Agente?
+#grid(
+  columns: 2,
+  gutter: 2em,
+  [
+    #strong[Sicurezza e Governance]
+    - #emph[Sandboxing]: isolamento esecuzione tools
+    - #emph[Autorizzazioni]: controllo accesso granulare
+    - #emph[Audit logging]: tracciabilità completa
+    - #emph[Rate limiting]: prevenzione abusi
+    - #emph[Secrets management]: gestione credenziali sicura
+  ],
+  [
+    #strong[Sviluppo Avanzato]
+    - #emph[Host personalizzati]: creare proprie applicazioni MCP
+    - #emph[Resources]: esporre dati dinamici read-only
+    - #emph[Prompts]: template riusabili per workflow
+  ],
+)
+
+
+= Prospettive Future
+
+== Sistemi Multi-Agente?
 #definition-block[Sistema Multi-Agente (MAS)][
   Sistema con #underline[molteplici agenti autonomi] che collaborano per obiettivi complessi impossibili per un singolo agente.
 ]
@@ -1104,7 +1175,7 @@ mcp.run(transport="streamable-http")
   gutter: 2em,
   [
     #strong[Limiti del singolo agente]
-    - Difficoltà con task multidimensionali
+    - Difficoltà con task multi-step
     - Mancanza di specializzazione
     - Single point of failure
     - Scalabilità limitata
@@ -1118,98 +1189,104 @@ mcp.run(transport="streamable-http")
   ],
 )
 
-#text(fill: gray, size: 0.9em)[
-  _\[IMAGE PLACEHOLDER: Confronto diagramma "Single Agent" vs "Multi-Agent System" - primo con bottleneck centrale, secondo con network distribuito di agenti specializzati\]_
+== Pattern e Framework MAS
+
+#strong[Pattern di collaborazione]
+#align(center)[
+ #image("images/architecture.png")
 ]
 
 == Pattern e Framework MAS
+
 #grid(
-  columns: 2,
-  gutter: 2em,
+  columns: 4,
+  gutter: 1.5em,
   [
-    #strong[Pattern di collaborazione]
-    - #emph[Sequenziale]: pipeline A → B → C
-    - #emph[Gerarchico]: supervisore + subordinati
-    - #emph[Collaborativo]: peer-to-peer parallelo
-    
-    #text(fill: gray, size: 0.8em)[
-      _\[IMAGE PLACEHOLDER: Tre mini-diagrammi dei pattern\]_
-    ]
+    #strong[Router Agent]
+    - Un agente centrale smista task a specialisti
+    - Esecuzione uno-a-uno sequenziale
   ],
   [
-    #strong[Framework principali (2025)]
-    - #emph[LangGraph]: low-level, controllo granulare
-    - #emph[CrewAI]: high-level, role-based
-    - #emph[AutoGen]: conversazionale, enterprise
-    
-    #text(fill: gray, size: 0.8em)[
-      _\[IMAGE PLACEHOLDER: Loghi framework\]_
-    ]
+    #strong[Parallel]
+    - Task distribuiti a più agenti contemporaneamente
+    - Risultati aggregati
+  ],
+  [
+    #strong[Sequential / Circular]
+    - Pipeline predefinita A → B → C
+    - Workflow ciclici possibili
+  ],
+  [
+    #strong[Dynamic]
+    - Agenti comunicano liberamente
+    - Rete all-to-all adattiva
   ],
 )
 
-== Caso d'Uso: Customer Support
-#strong[Architettura multi-agente per assistenza clienti]
+#strong[Framework principali (2025)]
+- #emph[LangGraph]: low-level, controllo granulare su grafi di esecuzione
+- #emph[CrewAI]: high-level, role-based con task automation
+- #emph[AutoGen]: conversazionale, enterprise-ready multi-agent
 
-#grid(
-  columns: 2,
-  gutter: 2em,
-  [
-    #strong[Agenti specializzati]:
-    1. Classifier (categorizza)
-    2. KB Retriever (cerca soluzione)
-    3. Responder (genera risposta)
-    4. Escalator (decide human escalation)
-    5. Feedback Collector
-  ],
-  [
-    #text(fill: gray, size: 0.9em)[
-      _\[IMAGE PLACEHOLDER: Flowchart con agenti in sequenza e decision point su Escalator\]_
-    ]
-    
-    #strong[Esempi reali]: Talkdesk, Zendesk AI, Google Cloud Contact Center
-  ],
-)
-
-== Componenti Chiave MAS
-#strong[Orchestrazione e Comunicazione]
-
-- #strong[Protocolli]: MCP (tools), A2A (agent-to-agent), ACP (orchestrazione)
-- #strong[Stato condiviso]: memoria breve (buffer) e lunga (DB)
-- #strong[Human-in-the-Loop (HITL)]: approval gates, draft-review, exception handling
-- #strong[Checkpointing]: persistenza stato, resume dopo failure
-
-#text(fill: gray, size: 0.9em)[
-  _\[IMAGE PLACEHOLDER: Diagramma architettura con Orchestrator, Shared State, Agents comunicanti via Protocols, HITL gate\]_
-]
-
-== Futuro dei Sistemi Multi-Agente
-#strong[Trend emergenti (2025+)]
-
-#grid(
-  columns: 2,
-  gutter: 2em,
-  [
-    #strong[Standardizzazione]
-    - Protocolli universali (A2A, ACP)
-    - Marketplace agenti riusabili
-    - Interoperabilità cross-framework
-    
-    #strong[Enterprise adoption]
-    - Cloud platforms (AWS Bedrock, Azure AI, Vertex AI)
-    - Governance e compliance integrate
-  ],
-  [
-    #strong[Intelligenza Ibrida]
-    - Self-healing systems
-    - Adaptive workflow generation
-    - Collaborazione seamless umano-agente
-    - Ethical AI guardrails
-    
-    #text(fill: gray, size: 0.8em)[
-      _\[IMAGE PLACEHOLDER: Roadmap visuale con milestone 2025-2027\]_
-    ]
-  ],
-)
 
 = Conclusioni
+
+== Ricapitolando
+
+- Gli #strong[agenti AI] sono sistemi che combinano #underline[LLM], #underline[strumenti esterni], e #underline[memoria] per eseguire compiti complessi
+- I #strong[provider] (cloud o locali) permettono di accedere a diversi LLM in modo standardizzato
+- #strong[MCP] risolve il problema dell'interoperabilità tra strumenti AI attraverso un protocollo standard aperto
+- Gli #strong[agenti locali] (Ollama, OpenWebUI, LM Studio) abilitano deployment privati e controllati
+
+== Prospettive Future
+
+#grid(
+columns: 2,
+gutter: 2em,
+[
+  #strong[Sistemi Multi-Agente]
+  - Orchestrazione complessa di agenti specializzati
+  - Pattern emergenti: router, parallel, dynamic
+  - Framework: LangGraph, CrewAI, AutoGen
+],
+[
+  #strong[Standardizzazione Ecosistema]
+  - Protocolli universali (A2A, ACP)
+  - Marketplace di agenti riusabili
+  - Interoperabilità cross-platform
+],
+)
+
+#grid(
+columns: 2,
+gutter: 2em,
+[
+  #strong[Agentic RAG & Deep Research]
+  - Retrieval con reasoning avanzato
+  - Sintesi multi-sorgente automatica
+  - Collaborative research agents
+],
+[
+  #strong[Computer Use Agents (CUA)]
+  - Controllo diretto GUI e applicazioni
+  - Automazione workflow end-to-end
+  - Interazione cross-application facilitata
+],
+)
+
+== Punti Aperti
+
+#strong[Sfide Tecniche]
+- #emph[Scalabilità]: gestione efficiente di migliaia di agenti concorrenti
+- #emph[Coordinazione]: meccanismi di comunicazione e sincronizzazione tra agenti
+- #emph[Osservabilità]: debugging e monitoring di sistemi multi-agente distribuiti
+
+#strong[Governance e Sicurezza]
+- #emph[Sandboxing]: isolamento esecuzione per prevenire comportamenti malevoli
+- #emph[Rate limiting]: prevenzione abusi e controllo costi
+- #emph[Audit trails]: tracciabilità decisioni e azioni degli agenti
+
+#strong[Ricerca e Sviluppo]
+- #emph[Emergent behavior]: comprensione dinamiche collettive non previste
+- #emph[Human-in-the-loop]: quando e come integrare supervisione umana
+- #emph[Benchmark standardizzati]: metriche condivise per valutare agenti
