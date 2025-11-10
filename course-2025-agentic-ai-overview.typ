@@ -83,6 +83,8 @@
 
 #text(size: 1.3em)[
   #components.adaptive-columns(outline(title: none, indent: 1em, depth: 1))
+
+  *code*: #link("https://github.com/cric96/code-2025-agentic-ai")
 ]
 #focus-slide[
   == Obiettivi
