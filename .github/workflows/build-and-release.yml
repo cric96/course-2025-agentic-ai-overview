@@ -77,7 +77,7 @@ jobs:
 
       - name: Build HTML File
         if: github.ref_name == 'main'
-        run: touying compile course-2025-ai-assisted-programming.typ --output build/index.html --format html --font-paths fonts
+        run: touying compile course-2025-agentic-ai-overview.typ --output build/index.html --format html --font-paths fonts
 
       - name: Deploy to GitHub Pages
         if: github.ref_name == 'main'
